@@ -1,31 +1,28 @@
 "use client";
 
-import { useState } from "react";
-
-// ═══════════════════════════════════════════════
-// WORDJAM — Jamaican Creole Literacy Platform
-// ═══════════════════════════════════════════════
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const GRADE_BANDS = [
-  { id: "seedling", label: "Seedling", emoji: "🌱", grades: "Pre-K – Grade K", ages: "Ages 3–5", desc: "Songs, sounds & very first words in Patwa and English", color: "#FFB900", bg: "rgba(255,185,0,0.1)", skills: ["Phonological Awareness", "Oral Vocabulary", "Listening"] },
-  { id: "sprout",   label: "Sprout",   emoji: "🌿", grades: "Grades 1–2",     ages: "Ages 6–7",  desc: "Phonics foundations with Jamaican Creole bridges",       color: "#00BF68", bg: "rgba(0,191,104,0.1)",  skills: ["Phonics", "Sight Words", "Creole–SJE Bridge"] },
-  { id: "sapling",  label: "Sapling",  emoji: "🌳", grades: "Grades 3–5",     ages: "Ages 8–10", desc: "Fluency, vocabulary expansion & comprehension",          color: "#009B55", bg: "rgba(0,155,85,0.1)",   skills: ["Reading Fluency", "Vocabulary", "Comprehension"] },
-  { id: "branch",   label: "Branch",   emoji: "🌲", grades: "Grades 6–8",     ages: "Ages 11–13",desc: "Critical literacy, code-switching & analytical reading",  color: "#1E90FF", bg: "rgba(30,144,255,0.1)", skills: ["Critical Literacy", "Code-Switching", "Analysis"] },
-  { id: "canopy",   label: "Canopy",   emoji: "🏔️", grades: "Grades 9–11",    ages: "Ages 14–17",desc: "Academic writing, research literacy & digital discourse", color: "#9D4EDD", bg: "rgba(157,78,221,0.1)", skills: ["Academic Writing", "Research", "Digital Discourse"] },
+  { id: "seedling", label: "Seedling", emoji: "ð±", grades: "Pre-K â Grade K", ages: "Ages 3â5", desc: "Songs, sounds & very first words in Patwa and English", color: "#FFB900", bg: "rgba(255,185,0,0.1)", skills: ["Phonological Awareness", "Oral Vocabulary", "Listening"] },
+  { id: "sprout",   label: "Sprout",   emoji: "ð¿", grades: "Grades 1â2",     ages: "Ages 6â7",  desc: "Phonics foundations with Jamaican Creole bridges",       color: "#00BF68", bg: "rgba(0,191,104,0.1)",  skills: ["Phonics", "Sight Words", "CreoleâSJE Bridge"] },
+  { id: "sapling",  label: "Sapling",  emoji: "ð³", grades: "Grades 3â5",     ages: "Ages 8â10", desc: "Fluency, vocabulary expansion & comprehension",          color: "#009B55", bg: "rgba(0,155,85,0.1)",   skills: ["Reading Fluency", "Vocabulary", "Comprehension"] },
+  { id: "branch",   label: "Branch",   emoji: "ð²", grades: "Grades 6â8",     ages: "Ages 11â13",desc: "Critical literacy, code-switching & analytical reading",  color: "#1E90FF", bg: "rgba(30,144,255,0.1)", skills: ["Critical Literacy", "Code-Switching", "Analysis"] },
+  { id: "canopy",   label: "Canopy",   emoji: "ðï¸", grades: "Grades 9â11",    ages: "Ages 14â17",desc: "Academic writing, research literacy & digital discourse", color: "#9D4EDD", bg: "rgba(157,78,221,0.1)", skills: ["Academic Writing", "Research", "Digital Discourse"] },
 ];
 
 const STORY_PATWA = [
   "Anansi did love fi tell story more dan anyting inna di world.",
-  "One bright mawnin, im climb up im web — high, high inna di Blue Mountain sky, where di cloud dem touch di tallest treetop.",
+  "One bright mawnin, im climb up im web â high, high inna di Blue Mountain sky, where di cloud dem touch di tallest treetop.",
   '"Mi rich!" Anansi seh, lookin dung pon di whole a Jamaica. "Mi have more story dan anybody inna di whole wide world."',
-  "But den a likkle hummingbird fly up beside him. 'Anansi,' she seh soft-soft, 'story is fi share — not fi keep to yuhself.'",
+  "But den a likkle hummingbird fly up beside him. 'Anansi,' she seh soft-soft, 'story is fi share â not fi keep to yuhself.'",
 ];
 
 const STORY_SJE = [
   "Anansi loved to tell stories more than anything else in the world.",
-  "One bright morning, he climbed up his web — high, high into the Blue Mountain sky, where the clouds touched the tallest treetops.",
+  "One bright morning, he climbed up his web â high, high into the Blue Mountain sky, where the clouds touched the tallest treetops.",
   '"I am rich!" Anansi said, looking down at all of Jamaica. "I have more stories than anyone in the whole wide world."',
-  "But then a little hummingbird flew up beside him. 'Anansi,' she said softly, 'stories are meant to be shared — not kept for yourself.'",
+  "But then a little hummingbird flew up beside him. 'Anansi,' she said softly, 'stories are meant to be shared â not kept for yourself.'",
 ];
 
 const VOCAB = [
@@ -36,18 +33,18 @@ const VOCAB = [
 ];
 
 const BADGES = [
-  { name: "First Word",     emoji: "⭐", earned: true,  color: "#FFB900" },
-  { name: "Anansi Scholar", emoji: "🕷️", earned: true,  color: "#009B55" },
-  { name: "Patwa Bridge",   emoji: "🌉", earned: true,  color: "#1E90FF" },
-  { name: "Blue Mountain",  emoji: "🏔️", earned: false, color: "#9D4EDD" },
-  { name: "Word Master",    emoji: "📚", earned: false, color: "#C4622D" },
-  { name: "Storyteller",    emoji: "🎙️", earned: false, color: "#FFB900" },
+  { name: "First Word",     emoji: "â­", earned: true,  color: "#FFB900" },
+  { name: "Anansi Scholar", emoji: "ð·ï¸", earned: true,  color: "#009B55" },
+  { name: "Patwa Bridge",   emoji: "ð", earned: true,  color: "#1E90FF" },
+  { name: "Blue Mountain",  emoji: "ðï¸", earned: false, color: "#9D4EDD" },
+  { name: "Word Master",    emoji: "ð", earned: false, color: "#C4622D" },
+  { name: "Storyteller",    emoji: "ðï¸", earned: false, color: "#FFB900" },
 ];
 
 const SKILLS_PROGRESS = [
   { name: "Phonics & Decoding",       pct: 82, color: "#FFB900" },
   { name: "Reading Fluency",          pct: 71, color: "#009B55" },
-  { name: "Vocabulary (Patwa–SJE)",   pct: 65, color: "#1E90FF" },
+  { name: "Vocabulary (PatwaâSJE)",   pct: 65, color: "#1E90FF" },
   { name: "Comprehension",            pct: 78, color: "#9D4EDD" },
   { name: "Writing Expression",       pct: 54, color: "#C4622D" },
 ];
@@ -93,19 +90,131 @@ const GLOBAL_CSS = `
 .f3{animation:float 6s ease-in-out infinite 2.4s}
 .f4{animation:float 4.5s ease-in-out infinite .7s}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.skip-link{position:absolute;top:-40px;left:0;background:#FFB900;color:#080A08;padding:8px 16px;text-decoration:none;z-index:100;border-radius:0 0 8px 0;font-weight:600;font-size:13px;}
+.skip-link:focus{top:0;}
 `;
+
+function AuthModal({ isOpen, onClose, onAuth }: { isOpen: boolean; onClose: () => void; onAuth: (email: string, password: string, name: string, role: string, gradeBand: string) => void }) {
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("learner");
+  const [gradeBand, setGradeBand] = useState("sapling");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await onAuth(email, password, name, role, gradeBand);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || "Authentication failed");
+    }
+    setLoading(false);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{ position:"fixed", top:0, left:0, right:0, bottom:0, background:"rgba(0,0,0,.6)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 }} onClick={onClose}>
+      <div style={{ background:"#111411", borderRadius:20, padding:40, maxWidth:420, width:"90%", border:"1px solid rgba(255,248,231,.1)" }} onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} style={{ position:"absolute", top:16, right:16, background:"transparent", border:"none", fontSize:20, cursor:"pointer", color:"rgba(255,248,231,.5)" }}>Ã</button>
+
+        <h2 className="wj-h" style={{ fontSize:26, color:"#FFF8E7", marginBottom:8 }}>
+          {mode === "signin" ? "Welcome Back" : "Join WordJam"}
+        </h2>
+        <p style={{ color:"rgba(255,248,231,.5)", fontSize:13, marginBottom:24 }}>
+          {mode === "signin" ? "Sign in to your account" : "Create a new account"}
+        </p>
+
+        <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          {mode === "signup" && (
+            <input
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required={mode === "signup"}
+              style={{ padding:"12px 16px", borderRadius:10, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:14, outline:"none" }}
+              aria-label="Your name"
+            />
+          )}
+
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            style={{ padding:"12px 16px", borderRadius:10, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:14, outline:"none" }}
+            aria-label="Email address"
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            style={{ padding:"12px 16px", borderRadius:10, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:14, outline:"none" }}
+            aria-label="Password"
+          />
+
+          {mode === "signup" && (
+            <>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"rgba(255,248,231,.7)", marginBottom:8 }}>Role</label>
+                <select value={role} onChange={e => setRole(e.target.value)} style={{ width:"100%", padding:"10px 14px", borderRadius:8, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:13, cursor:"pointer" }} aria-label="Select role">
+                  <option value="learner">Learner</option>
+                  <option value="teacher">Teacher</option>
+                  <option value="parent">Parent</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"rgba(255,248,231,.7)", marginBottom:8 }}>Grade Band</label>
+                <select value={gradeBand} onChange={e => setGradeBand(e.target.value)} style={{ width:"100%", padding:"10px 14px", borderRadius:8, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:13, cursor:"pointer" }} aria-label="Select grade band">
+                  {GRADE_BANDS.map(b => <option key={b.id} value={b.id}>{b.label}</option>)}
+                </select>
+              </div>
+            </>
+          )}
+
+          {error && <div style={{ padding:12, borderRadius:8, background:"rgba(255,80,80,.15)", border:"1px solid rgba(255,80,80,.3)", color:"#ff6060", fontSize:12 }}>{error}</div>}
+
+          <button type="submit" disabled={loading} className="btn-g" style={{ marginTop:8, fontSize:14, padding:"14px 24px" }}>
+            {loading ? "Loading..." : (mode === "signin" ? "Sign In" : "Create Account")}
+          </button>
+        </form>
+
+        <div style={{ marginTop:20, textAlign:"center" }}>
+          <span style={{ color:"rgba(255,248,231,.5)", fontSize:13 }}>
+            {mode === "signin" ? "Don't have an account? " : "Already have an account? "}
+            <button onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }} style={{ background:"none", border:"none", color:"#FFB900", cursor:"pointer", fontSize:13, fontWeight:600 }}>
+              {mode === "signin" ? "Sign up" : "Sign in"}
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function LandingView({ navigate }: { navigate: (v: string) => void }) {
   return (
     <div>
       <section style={{ minHeight:"calc(100vh - 62px)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 40px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"20%", left:"50%", transform:"translateX(-50%)", width:700, height:450, background:"radial-gradient(ellipse,rgba(0,155,85,.13) 0%,rgba(255,185,0,.07) 45%,transparent 70%)", pointerEvents:"none" }}/>
-        <div className="f1" style={{ position:"absolute", top:"15%", left:"10%", fontSize:52, opacity:.55 }}>🌿</div>
-        <div className="f2" style={{ position:"absolute", top:"18%", right:"9%",  fontSize:40, opacity:.45 }}>📖</div>
-        <div className="f3" style={{ position:"absolute", bottom:"28%", left:"7%", fontSize:36, opacity:.45 }}>🕷️</div>
-        <div className="f4" style={{ position:"absolute", bottom:"25%", right:"11%",fontSize:44, opacity:.4 }}>🌺</div>
+        <div className="f1" style={{ position:"absolute", top:"15%", left:"10%", fontSize:52, opacity:.55 }} aria-hidden="true">ð¿</div>
+        <div className="f2" style={{ position:"absolute", top:"18%", right:"9%",  fontSize:40, opacity:.45 }} aria-hidden="true">ð</div>
+        <div className="f3" style={{ position:"absolute", bottom:"28%", left:"7%", fontSize:36, opacity:.45 }} aria-hidden="true">ð·ï¸</div>
+        <div className="f4" style={{ position:"absolute", bottom:"25%", right:"11%",fontSize:44, opacity:.4 }} aria-hidden="true">ðº</div>
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(0,155,85,.14)", border:"1px solid rgba(0,155,85,.3)", borderRadius:100, padding:"8px 18px", marginBottom:28, fontSize:13, fontWeight:600, color:"#00BF68" }}>
-          🇯🇲 Jamaica&apos;s Creole-Affirming Literacy Platform
+          ð¯ð² Jamaica&apos;s Creole-Affirming Literacy Platform
         </div>
         <h1 className="wj-h" style={{ fontSize:"clamp(56px,9vw,100px)", textAlign:"center", lineHeight:1, color:"#FFF8E7", marginBottom:10, letterSpacing:-1 }}>
           WORD<span style={{ color:"#FFB900" }}>JAM</span>
@@ -118,8 +227,8 @@ function LandingView({ navigate }: { navigate: (v: string) => void }) {
           Bridging Jamaican Patwa and Standard English for learners from Early Childhood through Grade 11. Culturally rooted. AI-powered. NSC-aligned.
         </p>
         <div style={{ display:"flex", gap:14, flexWrap:"wrap", justifyContent:"center", marginBottom:80 }}>
-          <button className="btn-g" onClick={() => navigate("bands")} style={{ fontSize:15, padding:"15px 36px" }}>Choose Your Level 🌱</button>
-          <button className="btn-o" onClick={() => navigate("read")} style={{ fontSize:15, padding:"15px 36px" }}>Read a Story</button>
+          <button className="btn-g" onClick={() => navigate("bands")} style={{ fontSize:15, padding:"15px 36px" }} aria-label="Choose your learning level">Choose Your Level ð±</button>
+          <button className="btn-o" onClick={() => navigate("read")} style={{ fontSize:15, padding:"15px 36px" }} aria-label="Read a story">Read a Story</button>
         </div>
         <div style={{ display:"flex", gap:52, flexWrap:"wrap", justifyContent:"center" }}>
           {[["5","Grade Bands"],["200+","Cultural Stories"],["2","Language Modes"],["AI-Powered","Writing Feedback"]].map(([n,l])=>(
@@ -136,15 +245,15 @@ function LandingView({ navigate }: { navigate: (v: string) => void }) {
         </h2>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:18, maxWidth:1100, margin:"0 auto" }}>
           {[
-            { icon:"🌉", title:"Creole Bridge Reader",   desc:"Toggle between Jamaican Patwa and Standard English. Same story, both tongues — neither inferior.", color:"#FFB900" },
-            { icon:"🤖", title:"AI Writing Coach",       desc:"Claude-powered feedback that honours code-switching and celebrates Creole voice as sophisticated skill.", color:"#009B55" },
-            { icon:"🎙️", title:"Oral Literacy Lab",      desc:"Record Anansi retellings, oral reports & yard stories. AI analyses fluency with cultural affirmation.", color:"#1E90FF" },
-            { icon:"🗺️", title:"Jamaica Journey Map",    desc:"Gamified parish-to-parish progress. Earn 'Maroon Scholar' and 'Blue Mountain Reader' badges.", color:"#9D4EDD" },
-            { icon:"🏫", title:"Teacher Command Centre", desc:"NSC-aligned assignment builder, class dashboards, and AI-pre-scored writing review queues.", color:"#C4622D" },
-            { icon:"🏠", title:"Family Literacy Portal", desc:"Parent summaries in Patwa and English, plus 'Yard Time' reading activities for home.", color:"#00BF68" },
+            { icon:"ð", title:"Creole Bridge Reader",   desc:"Toggle between Jamaican Patwa and Standard English. Same story, both tongues â neither inferior.", color:"#FFB900" },
+            { icon:"ð¤", title:"AI Writing Coach",       desc:"Claude-powered feedback that honours code-switching and celebrates Creole voice as sophisticated skill.", color:"#009B55" },
+            { icon:"ðï¸", title:"Oral Literacy Lab",      desc:"Record Anansi retellings, oral reports & yard stories. AI analyses fluency with cultural affirmation.", color:"#1E90FF" },
+            { icon:"ðºï¸", title:"Jamaica Journey Map",    desc:"Gamified parish-to-parish progress. Earn 'Maroon Scholar' and 'Blue Mountain Reader' badges.", color:"#9D4EDD" },
+            { icon:"ð«", title:"Teacher Command Centre", desc:"NSC-aligned assignment builder, class dashboards, and AI-pre-scored writing review queues.", color:"#C4622D" },
+            { icon:"ð ", title:"Family Literacy Portal", desc:"Parent summaries in Patwa and English, plus 'Yard Time' reading activities for home.", color:"#00BF68" },
           ].map(f=>(
             <div key={f.title} className="hover-lift" style={{ background:"#111411", borderRadius:16, padding:26, border:"1px solid rgba(255,248,231,.07)" }}>
-              <div style={{ fontSize:34, marginBottom:14 }}>{f.icon}</div>
+              <div style={{ fontSize:34, marginBottom:14 }} aria-hidden="true">{f.icon}</div>
               <h3 style={{ fontSize:16, fontWeight:700, marginBottom:8, color:f.color }}>{f.title}</h3>
               <p style={{ fontSize:13, color:"rgba(255,248,231,.6)", lineHeight:1.65 }}>{f.desc}</p>
             </div>
@@ -152,10 +261,10 @@ function LandingView({ navigate }: { navigate: (v: string) => void }) {
         </div>
       </section>
       <section style={{ padding:"80px 40px", textAlign:"center", background:"linear-gradient(135deg,rgba(0,155,85,.13) 0%,rgba(255,185,0,.07) 100%)", borderTop:"1px solid rgba(255,185,0,.1)" }}>
-        <p style={{ fontSize:12, color:"#009B55", fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:16 }}>🇯🇲 Rooted in Jamaica. Built for the World.</p>
+        <p style={{ fontSize:12, color:"#009B55", fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:16 }}>ð¯ð² Rooted in Jamaica. Built for the World.</p>
         <h2 className="wj-h" style={{ fontSize:40, color:"#FFF8E7", marginBottom:18 }}>Ready to Start the Journey?</h2>
         <p style={{ color:"rgba(255,248,231,.6)", marginBottom:36, fontSize:15 }}>Free for learners. Powerful tools for teachers. Insights for families.</p>
-        <button className="btn-g" onClick={() => navigate("bands")} style={{ fontSize:15, padding:"15px 38px" }}>Pick Your Grade Band →</button>
+        <button className="btn-g" onClick={() => navigate("bands")} style={{ fontSize:15, padding:"15px 38px" }} aria-label="Pick your grade band">Pick Your Grade Band â</button>
       </section>
     </div>
   );
@@ -168,15 +277,18 @@ function GradeBandsView({ navigate, activeBand, setActiveBand }: { navigate: (v:
         <div style={{ textAlign:"center", marginBottom:52 }}>
           <p style={{ color:"#009B55", fontWeight:700, fontSize:12, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>YOUR LEARNING PATH</p>
           <h2 className="wj-h" style={{ fontSize:40, color:"#FFF8E7", marginBottom:10 }}>Choose Your <span style={{ color:"#FFB900" }}>Grade Band</span></h2>
-          <p style={{ color:"rgba(255,248,231,.5)", fontSize:15, maxWidth:460, margin:"0 auto" }}>Five pathways from first sounds to academic mastery — all rooted in Jamaican culture.</p>
+          <p style={{ color:"rgba(255,248,231,.5)", fontSize:15, maxWidth:460, margin:"0 auto" }}>Five pathways from first sounds to academic mastery â all rooted in Jamaican culture.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           {GRADE_BANDS.map((band,i)=>(
             <div key={band.id} className="band-card"
               onClick={()=>setActiveBand(activeBand===band.id?null:band.id)}
-              style={{ background:activeBand===band.id?band.bg:"#111411", border:`1.5px solid ${activeBand===band.id?band.color+"55":"rgba(255,248,231,.07)"}`, borderRadius:16, padding:"22px 26px", display:"flex", alignItems:"center", gap:22, flexWrap:"wrap" }}>
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if(e.key==="Enter" || e.key===" ") setActiveBand(activeBand===band.id?null:band.id); }}
+              style={{ background:activeBand===band.id?band.bg:"#111411", border:`1.5px solid ${activeBand===band.id?band.color+"55":"rgba(255,248,231,.07)"}`, borderRadius:16, padding:"22px 26px", display:"flex", alignItems:"center", gap:22, flexWrap:"wrap", cursor:"pointer" }}>
               <div className="wj-h" style={{ fontSize:44, color:band.color, opacity:.25, minWidth:36, lineHeight:1 }}>{i+1}</div>
-              <div style={{ fontSize:38 }}>{band.emoji}</div>
+              <div style={{ fontSize:38 }} aria-hidden="true">{band.emoji}</div>
               <div style={{ flex:1, minWidth:160 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
                   <span className="wj-h" style={{ fontSize:20, color:band.color }}>{band.label}</span>
@@ -191,14 +303,15 @@ function GradeBandsView({ navigate, activeBand, setActiveBand }: { navigate: (v:
                 ))}
               </div>
               <button className="btn-g" onClick={e=>{e.stopPropagation();navigate("read");}}
-                style={{ padding:"11px 22px", fontSize:13, background:band.color, whiteSpace:"nowrap" }}>
-                Start →
+                style={{ padding:"11px 22px", fontSize:13, background:band.color, whiteSpace:"nowrap" }}
+                aria-label={`Start ${band.label} level`}>
+                Start â
               </button>
             </div>
           ))}
         </div>
         <div style={{ marginTop:36, padding:20, borderRadius:12, background:"rgba(0,155,85,.08)", border:"1px solid rgba(0,155,85,.22)", display:"flex", alignItems:"center", gap:14 }}>
-          <span style={{ fontSize:22 }}>📋</span>
+          <span style={{ fontSize:22 }} aria-hidden="true">ð</span>
           <p style={{ fontSize:13, color:"rgba(255,248,231,.7)", lineHeight:1.6 }}>
             <strong style={{ color:"#009B55" }}>NSC-Aligned:</strong> All grade bands are mapped to Jamaica&apos;s National Standards Curriculum literacy benchmarks. Teachers can view alignment in the Command Centre.
           </p>
@@ -208,130 +321,540 @@ function GradeBandsView({ navigate, activeBand, setActiveBand }: { navigate: (v:
   );
 }
 
-function ReadingView({ showPatwa, setShowPatwa }: { showPatwa: boolean; setShowPatwa: (v: boolean) => void }) {
-  const [mode, setMode] = useState("single");
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const LangBtn = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} style={{ padding:"9px 18px", borderRadius:100, border:"none", cursor:"pointer", fontSize:13, fontWeight:600, fontFamily:"'DM Sans',sans-serif", transition:"all .2s", background:active?"#FFB900":"transparent", color:active?"#080A08":"rgba(255,248,231,.6)" }}>{label}</button>
+function StoryLibraryView({ navigate, user }: { navigate: (v: string) => void; user: any }) {
+  const [stories, setStories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const { data, error } = await supabase.from("stories").select("*");
+        if (error) throw error;
+        setStories(data || []);
+      } catch (err: any) {
+        setError(err.message);
+      }
+      setLoading(false);
+    };
+    fetchStories();
+  }, []);
+
+  return (
+    <div style={{ minHeight:"100vh", padding:"48px 40px" }}>
+      <div style={{ maxWidth:1200, margin:"0 auto" }}>
+        <div style={{ marginBottom:40 }}>
+          <p style={{ color:"rgba(255,248,231,.45)", fontSize:13, marginBottom:8 }}>STORY COLLECTION</p>
+          <h2 className="wj-h" style={{ fontSize:38, color:"#FFF8E7", marginBottom:8 }}>Jamaican Tales & Caribbean Stories</h2>
+          <p style={{ color:"rgba(255,248,231,.6)", fontSize:14 }}>Culturally rooted narratives in Patwa and Standard English</p>
+        </div>
+
+        {loading && <div style={{ textAlign:"center", color:"rgba(255,248,231,.5)", padding:"60px 20px" }}>Loading stories...</div>}
+        {error && <div style={{ padding:20, borderRadius:12, background:"rgba(255,80,80,.1)", border:"1px solid rgba(255,80,80,.2)", color:"#ff6060" }}>{error}</div>}
+
+        {!loading && stories.length > 0 && (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:20 }}>
+            {stories.map(story => (
+              <div key={story.id} className="hover-lift" style={{ background:"#111411", borderRadius:16, overflow:"hidden", border:"1px solid rgba(255,248,231,.07)", cursor:"pointer" }} onClick={() => navigate(`story:${story.id}`)}>
+                <div style={{ background:"linear-gradient(135deg,#FFB900,#009B55)", height:140, display:"flex", alignItems:"center", justifyContent:"center", fontSize:64 }} aria-hidden="true">{story.cover_emoji}</div>
+                <div style={{ padding:20 }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:"#FFB900", letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>{story.origin_country} {story.origin_flag}</div>
+                  <h3 style={{ fontSize:16, fontWeight:700, color:"#FFF8E7", marginBottom:8, lineHeight:1.3 }}>{story.title}</h3>
+                  <p style={{ fontSize:12, color:"rgba(255,248,231,.5)", marginBottom:12 }}>{story.summary}</p>
+                  <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                    <span style={{ fontSize:10, padding:"3px 10px", borderRadius:100, background:"rgba(255,185,0,.1)", color:"#FFB900" }}>Level: {story.difficulty_level}</span>
+                    <span style={{ fontSize:10, padding:"3px 10px", borderRadius:100, background:"rgba(0,155,85,.1)", color:"#009B55" }}>{story.word_count} words</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && stories.length === 0 && (
+          <div style={{ textAlign:"center", padding:"60px 20px", color:"rgba(255,248,231,.5)" }}>
+            <div style={{ fontSize:40, marginBottom:16 }}>ð</div>
+            <p>Stories loading soon. Check back shortly!</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
+}
+
+function StoryReaderView({ navigate, storyId, user }: { navigate: (v: string) => void; storyId: string; user: any }) {
+  const [story, setStory] = useState<any>(null);
+  const [pages, setPages] = useState<any[]>([]);
+  const [vocab, setVocab] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState("single");
+  const [showPatwa, setShowPatwa] = useState(true);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    const fetchStoryData = async () => {
+      try {
+        const [storyRes, pagesRes, vocabRes, qRes] = await Promise.all([
+          supabase.from("stories").select("*").eq("id", storyId).single(),
+          supabase.from("story_pages").select("*").eq("story_id", storyId).order("page_number"),
+          supabase.from("vocabulary").select("*").eq("story_id", storyId),
+          supabase.from("comprehension_questions").select("*").eq("story_id", storyId),
+        ]);
+
+        if (storyRes.data) setStory(storyRes.data);
+        if (pagesRes.data) setPages(pagesRes.data);
+        if (vocabRes.data) setVocab(vocabRes.data);
+        if (qRes.data) setQuestions(qRes.data);
+      } catch (err: any) {
+        console.error("Error fetching story:", err);
+      }
+      setLoading(false);
+    };
+    fetchStoryData();
+  }, [storyId]);
+
+  const handleQuizSubmit = async () => {
+    if (!user || !story) return;
+    try {
+      const { data: profile } = await supabase.from("learner_profiles").select("id").eq("auth_user_id", user.id).single();
+      if (profile) {
+        await supabase.from("reading_progress").insert({
+          learner_id: profile.id,
+          story_id: story.id,
+          current_page: pages.length,
+          completed: true,
+          quiz_score: Object.values(answers).filter((a, i) => a === questions[i]?.correct_index).length,
+          quiz_total: questions.length,
+        });
+      }
+    } catch (err) {
+      console.error("Error saving progress:", err);
+    }
+  };
+
+  if (loading) return <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,248,231,.5)" }}>Loading story...</div>;
+
+  if (!story) return <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,248,231,.5)" }}>Story not found</div>;
+
+  const useHardcodedAnansi = storyId === "anansi";
+  const storyPages = useHardcodedAnansi ? STORY_PATWA.map((text, i) => ({ page_number: i+1, text, bg_color: "#111411" })) : pages;
+  const storyPagesSJE = useHardcodedAnansi ? STORY_SJE : [];
+
+  const LangBtn = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
+    <button onClick={onClick} style={{ padding:"9px 18px", borderRadius:100, border:"none", cursor:"pointer", fontSize:13, fontWeight:600, fontFamily:"'DM Sans',sans-serif", transition:"all .2s", background:active?"#FFB900":"transparent", color:active?"#080A08":"rgba(255,248,231,.6)" }} aria-pressed={active}>{label}</button>
+  );
+
   return (
     <div style={{ minHeight:"100vh", padding:"48px 40px" }}>
       <div style={{ maxWidth:900, margin:"0 auto" }}>
         <div style={{ marginBottom:30 }}>
           <div style={{ display:"flex", gap:8, marginBottom:12 }}>
-            <span style={{ fontSize:11, fontWeight:700, padding:"4px 12px", borderRadius:100, background:"rgba(255,185,0,.14)", color:"#FFB900", letterSpacing:1, textTransform:"uppercase" }}>Anansi Series · Sapling Level</span>
-            <span style={{ fontSize:12, color:"rgba(255,248,231,.4)", alignSelf:"center" }}>Grades 3–5 · Ages 8–10</span>
+            <span style={{ fontSize:11, fontWeight:700, padding:"4px 12px", borderRadius:100, background:"rgba(255,185,0,.14)", color:"#FFB900", letterSpacing:1, textTransform:"uppercase" }}>Anansi Series</span>
+            <span style={{ fontSize:12, color:"rgba(255,248,231,.4)", alignSelf:"center" }}>{story.difficulty_level}</span>
           </div>
-          <h1 className="wj-h" style={{ fontSize:34, color:"#FFF8E7", marginBottom:7 }}>Anansi an di Hummingbird</h1>
-          <p style={{ fontSize:13, color:"rgba(255,248,231,.45)" }}>Retold in Jamaican Patwa and Standard Jamaican English</p>
+          <h1 className="wj-h" style={{ fontSize:34, color:"#FFF8E7", marginBottom:7 }}>{story.title}</h1>
+          <p style={{ fontSize:13, color:"rgba(255,248,231,.45)" }}>{story.summary}</p>
         </div>
+
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:26, flexWrap:"wrap", gap:12 }}>
           <div style={{ display:"flex", background:"#111411", borderRadius:100, padding:4, border:"1px solid rgba(255,248,231,.1)" }}>
-            <LangBtn label="🇯🇲 Patwa" active={showPatwa && mode==="single"} onClick={()=>{setShowPatwa(true);setMode("single");}}/>
-            <LangBtn label="🎓 English" active={!showPatwa && mode==="single"} onClick={()=>{setShowPatwa(false);setMode("single");}}/>
-            <LangBtn label="⇄ Side by Side" active={mode==="split"} onClick={()=>setMode("split")}/>
+            <LangBtn label="ð¯ð² Patwa" active={showPatwa && mode==="single"} onClick={()=>{setShowPatwa(true);setMode("single");}}/>
+            <LangBtn label="ð English" active={!showPatwa && mode==="single"} onClick={()=>{setShowPatwa(false);setMode("single");}}/>
+            <LangBtn label="â Side by Side" active={mode==="split"} onClick={()=>setMode("split")}/>
           </div>
-          <button style={{ display:"flex", alignItems:"center", gap:8, background:"rgba(0,155,85,.12)", border:"1.5px solid rgba(0,155,85,.3)", color:"#00BF68", padding:"10px 20px", borderRadius:100, fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
-            🎧 Listen (Jamaican Voice)
-          </button>
         </div>
+
         {mode==="split" ? (
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:18, marginBottom:36 }}>
             {[true,false].map(isPatwa=>(
               <div key={String(isPatwa)} style={{ background:"#111411", borderRadius:16, padding:26, border:`1.5px solid ${isPatwa?"rgba(255,185,0,.2)":"rgba(0,155,85,.2)"}` }}>
                 <div style={{ fontSize:11, fontWeight:700, letterSpacing:1.5, textTransform:"uppercase", color:isPatwa?"#FFB900":"#009B55", marginBottom:18, paddingBottom:12, borderBottom:`1px solid ${isPatwa?"rgba(255,185,0,.14)":"rgba(0,155,85,.14)"}` }}>
-                  {isPatwa?"🇯🇲 Jamaican Patwa":"🎓 Standard English"}
+                  {isPatwa?"ð¯ð² Jamaican Patwa":"ð Standard English"}
                 </div>
-                {(isPatwa?STORY_PATWA:STORY_SJE).map((p,i)=>(
-                  <p key={i} style={{ fontSize:15, lineHeight:1.85, color:"rgba(255,248,231,.9)", marginBottom:14, fontStyle:p.startsWith('"')?"italic":"normal" }}>{p}</p>
-                ))}
+                {(isPatwa?storyPages:storyPagesSJE.length>0?storyPagesSJE:STORY_SJE).map((p: any,i: number)=>{
+                  const text = typeof p === "string" ? p : p.text;
+                  return (<p key={i} style={{ fontSize:15, lineHeight:1.85, color:"rgba(255,248,231,.9)", marginBottom:14, fontStyle:text.startsWith('"')?"italic":"normal" }}>{text}</p>);
+                })}
               </div>
             ))}
           </div>
         ) : (
           <div style={{ background:"#111411", borderRadius:16, padding:34, marginBottom:36, border:"1px solid rgba(255,248,231,.07)" }}>
             <div style={{ fontSize:11, fontWeight:700, letterSpacing:1.5, textTransform:"uppercase", color:showPatwa?"#FFB900":"#009B55", marginBottom:22, paddingBottom:14, borderBottom:"1px solid rgba(255,248,231,.07)" }}>
-              {showPatwa?"🇯🇲 Jamaican Patwa":"🎓 Standard Jamaican English"}
+              {showPatwa?"ð¯ð² Jamaican Patwa":"ð Standard Jamaican English"}
             </div>
-            {(showPatwa?STORY_PATWA:STORY_SJE).map((p,i)=>(
-              <p key={i} style={{ fontSize:17, lineHeight:1.9, color:"rgba(255,248,231,.9)", marginBottom:20, fontStyle:p.startsWith('"')?"italic":"normal" }}>{p}</p>
-            ))}
+            {(showPatwa?storyPages:storyPagesSJE.length>0?storyPagesSJE:STORY_SJE).map((p: any,i: number)=>{
+              const text = typeof p === "string" ? p : p.text;
+              return (<p key={i} style={{ fontSize:17, lineHeight:1.9, color:"rgba(255,248,231,.9)", marginBottom:20, fontStyle:text.startsWith('"')?"italic":"normal" }}>{text}</p>);
+            })}
           </div>
         )}
+
         {showPatwa && mode==="single" && (
           <div style={{ marginBottom:32, padding:22, borderRadius:14, background:"rgba(255,185,0,.06)", border:"1px solid rgba(255,185,0,.2)" }}>
-            <h4 style={{ fontSize:12, fontWeight:700, color:"#FFB900", letterSpacing:1.5, textTransform:"uppercase", marginBottom:16 }}>🔤 Patwa Vocabulary Spotlight</h4>
+            <h4 style={{ fontSize:12, fontWeight:700, color:"#FFB900", letterSpacing:1.5, textTransform:"uppercase", marginBottom:16 }}>ð¤ Patwa Vocabulary Spotlight</h4>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))", gap:10 }}>
-              {VOCAB.map(v=>(
-                <div key={v.patwa} style={{ background:"#111411", borderRadius:10, padding:"13px 15px", border:"1px solid rgba(255,248,231,.07)" }}>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#FFB900", marginBottom:4 }}>{v.patwa}</div>
-                  <div style={{ fontSize:13, color:"rgba(255,248,231,.8)", marginBottom:5 }}>→ {v.sje}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,248,231,.38)" }}>{v.origin}</div>
+              {(vocab.length > 0 ? vocab : VOCAB).map((v: any)=>(
+                <div key={v.patwa || v.word} style={{ background:"#111411", borderRadius:10, padding:"13px 15px", border:"1px solid rgba(255,248,231,.07)" }}>
+                  <div style={{ fontSize:16, fontWeight:700, color:"#FFB900", marginBottom:4 }}>{v.patwa || v.word}</div>
+                  <div style={{ fontSize:13, color:"rgba(255,248,231,.8)", marginBottom:5 }}>â {v.sje || v.definition}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,248,231,.38)" }}>{v.origin || v.part_of_speech}</div>
                 </div>
               ))}
             </div>
           </div>
         )}
-        <div style={{ marginBottom:32 }}>
-          <h3 className="wj-h" style={{ fontSize:22, color:"#FFF8E7", marginBottom:18 }}>Check Your Understanding</h3>
-          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {COMPREHENSION_QS.map((q,qi)=>(
-              <div key={qi} style={{ background:"#111411", borderRadius:14, padding:24, border:"1px solid rgba(255,248,231,.07)" }}>
-                <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:100, background:q.type==="Literal"?"rgba(255,185,0,.14)":"rgba(30,144,255,.14)", color:q.type==="Literal"?"#FFB900":"#1E90FF", letterSpacing:1, textTransform:"uppercase", marginBottom:12, display:"inline-block" }}>{q.type}</span>
-                <p style={{ fontSize:15, color:"#FFF8E7", fontWeight:500, marginBottom:14 }}>{q.q}</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                  {q.options.map((opt,oi)=>{
-                    const sel = answers[qi]===oi;
-                    const correct = oi===q.correct;
-                    return (
-                      <button key={oi} onClick={()=>setAnswers(a=>({...a,[qi]:oi}))}
-                        style={{ textAlign:"left", padding:"11px 15px", borderRadius:10, cursor:"pointer", fontSize:13, fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
-                          background: sel?(correct?"rgba(0,155,85,.2)":"rgba(255,80,80,.14)"):"rgba(255,248,231,.04)",
-                          border: `1.5px solid ${sel?(correct?"#009B55":"#ff5050"):"rgba(255,248,231,.09)"}`,
-                          color:"#FFF8E7" }}>
-                        {opt} {sel && (correct?" ✅":" ❌")}
-                      </button>
-                    );
-                  })}
+
+        {questions.length > 0 && (
+          <div style={{ marginBottom:32 }}>
+            <h3 className="wj-h" style={{ fontSize:22, color:"#FFF8E7", marginBottom:18 }}>Check Your Understanding</h3>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              {(questions.length > 0 ? questions : COMPREHENSION_QS).map((q: any,qi: number)=>(
+                <div key={qi} style={{ background:"#111411", borderRadius:14, padding:24, border:"1px solid rgba(255,248,231,.07)" }}>
+                  <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:100, background:"rgba(255,185,0,.14)", color:"#FFB900", letterSpacing:1, textTransform:"uppercase", marginBottom:12, display:"inline-block" }}>{q.difficulty_level || "Question"}</span>
+                  <p style={{ fontSize:15, color:"#FFF8E7", fontWeight:500, marginBottom:14 }}>{q.question || q.q}</p>
+                  <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    {(q.options || q.options || []).map((opt: string,oi: number)=>{
+                      const sel = answers[qi]===oi;
+                      const correct = oi===(q.correct_index ?? q.correct);
+                      return (
+                        <button key={oi} onClick={()=>setAnswers(a=>({...a,[qi]:oi}))}
+                          style={{ textAlign:"left", padding:"11px 15px", borderRadius:10, cursor:"pointer", fontSize:13, fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+                            background: sel?(correct?"rgba(0,155,85,.2)":"rgba(255,80,80,.14)"):"rgba(255,248,231,.04)",
+                            border: `1.5px solid ${sel?(correct?"#009B55":"#ff5050"):"rgba(255,248,231,.09)"}`,
+                            color:"#FFF8E7" }}
+                          aria-pressed={sel}>
+                          {opt} {sel && (correct?" â":" â")}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <button className="btn-g" onClick={handleQuizSubmit} style={{ marginTop:20, padding:"14px 28px", fontSize:14 }}>Submit Quiz & Earn XP</button>
           </div>
-        </div>
+        )}
+
         <div style={{ textAlign:"center", padding:28, borderRadius:14, background:"linear-gradient(135deg,rgba(157,78,221,.12),rgba(30,144,255,.08))", border:"1px solid rgba(157,78,221,.22)" }}>
-          <div style={{ fontSize:28, marginBottom:10 }}>🤖</div>
+          <div style={{ fontSize:28, marginBottom:10 }} aria-hidden="true">ð¤</div>
           <h4 style={{ fontSize:17, fontWeight:700, color:"#FFF8E7", marginBottom:7 }}>Ready to Write About This Story?</h4>
-          <p style={{ fontSize:13, color:"rgba(255,248,231,.6)", marginBottom:20 }}>Use the AI Writing Studio — respond in Patwa, English, or both. Claude gives culturally-affirming feedback.</p>
-          <button className="btn-g" style={{ background:"#9D4EDD" }}>Open AI Writing Studio ✍️</button>
+          <p style={{ fontSize:13, color:"rgba(255,248,231,.6)", marginBottom:20 }}>Use the AI Writing Studio â respond in Patwa, English, or both. Claude gives culturally-affirming feedback.</p>
+          <button className="btn-g" style={{ background:"#9D4EDD" }} onClick={() => navigate("write")}>Open AI Writing Studio âï¸</button>
         </div>
       </div>
     </div>
   );
 }
 
-function DashboardView() {
+function WritingStudioView({ navigate, user }: { navigate: (v: string) => void; user: any }) {
+  const [content, setContent] = useState("");
+  const [gradeLevel, setGradeLevel] = useState("3-5");
+  const [writingType, setWritingType] = useState("narrative");
+  const [feedback, setFeedback] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (!content.trim()) {
+      setError("Please write something first!");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    setFeedback(null);
+
+    try {
+      const res = await fetch("/api/ai/writing-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: content, gradeLevel, gradeBand: "sapling", writingType }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setFeedback(data.feedback);
+        if (user) {
+          const { data: profile } = await supabase.from("learner_profiles").select("id").eq("auth_user_id", user.id).single();
+          if (profile) {
+            await supabase.from("user_writings").insert({
+              learner_id: profile.id,
+              title: content.substring(0, 50),
+              content,
+              writing_type: writingType,
+              grade_band: "sapling",
+              ai_feedback: data.feedback,
+              points_earned: 15,
+            });
+          }
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to get feedback");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", padding:"48px 40px" }}>
+      <div style={{ maxWidth:900, margin:"0 auto" }}>
+        <div style={{ marginBottom:32 }}>
+          <p style={{ color:"rgba(255,248,231,.45)", fontSize:13, marginBottom:8 }}>CREATIVE EXPRESSION</p>
+          <h2 className="wj-h" style={{ fontSize:38, color:"#FFF8E7", marginBottom:8 }}>AI Writing Studio</h2>
+          <p style={{ color:"rgba(255,248,231,.6)", fontSize:14 }}>Write in Patwa, English, or code-switch. Get culturally affirming feedback from Claude.</p>
+        </div>
+
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, marginBottom:24 }}>
+          <div>
+            <div style={{ background:"#111411", borderRadius:16, padding:24, border:"1px solid rgba(255,248,231,.07)" }}>
+              <label style={{ display:"block", fontSize:12, fontWeight:700, color:"rgba(255,248,231,.7)", marginBottom:12 }}>Writing Type</label>
+              <select value={writingType} onChange={e => setWritingType(e.target.value)} style={{ width:"100%", padding:"11px 14px", borderRadius:10, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", cursor:"pointer", marginBottom:16 }}>
+                <option value="narrative">Narrative / Story</option>
+                <option value="descriptive">Descriptive</option>
+                <option value="expository">Expository / Informative</option>
+                <option value="persuasive">Persuasive / Opinion</option>
+              </select>
+
+              <label style={{ display:"block", fontSize:12, fontWeight:700, color:"rgba(255,248,231,.7)", marginBottom:12 }}>Grade Level (for feedback)</label>
+              <select value={gradeLevel} onChange={e => setGradeLevel(e.target.value)} style={{ width:"100%", padding:"11px 14px", borderRadius:10, background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", cursor:"pointer" }}>
+                <option value="1-2">Grades 1-2</option>
+                <option value="3-5">Grades 3-5</option>
+                <option value="6-8">Grades 6-8</option>
+                <option value="9-11">Grades 9-11</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ background:"#111411", borderRadius:16, padding:24, border:"1px solid rgba(255,248,231,.07)" }}>
+            <div style={{ fontSize:13, color:"rgba(255,248,231,.6)", lineHeight:1.6 }}>
+              <p style={{ marginBottom:12 }}><strong style={{ color:"#FFB900" }}>Pro Tips:</strong></p>
+              <ul style={{ paddingLeft:16, display:"flex", flexDirection:"column", gap:6 }}>
+                <li>Use Patwa freely â it's a sophisticated language</li>
+                <li>Code-switch if it feels natural to your story</li>
+                <li>Include sensory details & dialogue</li>
+                <li>Claude will celebrate your authentic voice</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          placeholder="Write your story, poem, reflection, or idea here. Use Patwa, English, or both..."
+          style={{ width:"100%", minHeight:300, padding:20, borderRadius:16, background:"#111411", border:"1.5px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:15, lineHeight:1.7, resize:"vertical", outline:"none" }}
+          aria-label="Writing area"
+        />
+
+        <div style={{ display:"flex", gap:12, marginTop:20, marginBottom:32 }}>
+          <button className="btn-g" onClick={handleSubmit} disabled={loading} style={{ flex:1, padding:"15px 28px", fontSize:14 }}>
+            {loading ? "Getting Feedback..." : "Get AI Feedback ð¤"}
+          </button>
+          <button className="btn-o" onClick={() => { setContent(""); setFeedback(null); }} style={{ padding:"15px 28px", fontSize:14 }}>Clear</button>
+        </div>
+
+        {error && <div style={{ padding:16, borderRadius:12, background:"rgba(255,80,80,.15)", border:"1px solid rgba(255,80,80,.3)", color:"#ff6060", marginBottom:24 }}>{error}</div>}
+
+        {feedback && (
+          <div style={{ background:"#111411", borderRadius:16, padding:28, border:"1px solid rgba(255,248,231,.07)" }}>
+            <h3 className="wj-h" style={{ fontSize:22, color:"#FFB900", marginBottom:20 }}>Claude's Feedback</h3>
+            <div style={{ color:"rgba(255,248,231,.85)", lineHeight:1.7, fontSize:14 }}>
+              {typeof feedback === "string" ? (
+                <p>{feedback}</p>
+              ) : (
+                <div>
+                  {feedback.strengths && (
+                    <div style={{ marginBottom:16 }}>
+                      <h4 style={{ color:"#00BF68", fontWeight:600, marginBottom:8 }}>Strengths:</h4>
+                      <p>{feedback.strengths}</p>
+                    </div>
+                  )}
+                  {feedback.improvements && (
+                    <div style={{ marginBottom:16 }}>
+                      <h4 style={{ color:"#FFB900", fontWeight:600, marginBottom:8 }}>Areas to Grow:</h4>
+                      <p>{feedback.improvements}</p>
+                    </div>
+                  )}
+                  {feedback.encouragement && (
+                    <div>
+                      <h4 style={{ color:"#9D4EDD", fontWeight:600, marginBottom:8 }}>Encouragement:</h4>
+                      <p>{feedback.encouragement}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <button className="btn-g" style={{ marginTop:20 }} onClick={() => setFeedback(null)}>Close Feedback</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CreoleBridgeView({ navigate }: { navigate: (v: string) => void }) {
+  const [text, setText] = useState("");
+  const [direction, setDirection] = useState("patwa-sje");
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleTranslate = async () => {
+    if (!text.trim()) {
+      setError("Please enter some text");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    setResult(null);
+
+    try {
+      const res = await fetch("/api/ai/creole-bridge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, direction, gradeBand: "sapling" }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setResult(data.bridge);
+      }
+    } catch (err: any) {
+      setError(err.message || "Translation failed");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", padding:"48px 40px" }}>
+      <div style={{ maxWidth:900, margin:"0 auto" }}>
+        <div style={{ marginBottom:32 }}>
+          <p style={{ color:"rgba(255,248,231,.45)", fontSize:13, marginBottom:8 }}>LANGUAGE BRIDGING</p>
+          <h2 className="wj-h" style={{ fontSize:38, color:"#FFF8E7", marginBottom:8 }}>Creole Bridge Tool</h2>
+          <p style={{ color:"rgba(255,248,231,.6)", fontSize:14 }}>Translate between Jamaican Patwa and Standard English with linguistic explanations.</p>
+        </div>
+
+        <div style={{ background:"#111411", borderRadius:16, padding:28, border:"1px solid rgba(255,248,231,.07)", marginBottom:24 }}>
+          <div style={{ marginBottom:20 }}>
+            <label style={{ display:"block", fontSize:12, fontWeight:700, color:"rgba(255,248,231,.7)", marginBottom:12 }}>Translation Direction</label>
+            <div style={{ display:"flex", gap:8 }}>
+              {[
+                { id:"patwa-sje", label:"ð¯ð² Patwa â ð English" },
+                { id:"sje-patwa", label:"ð English â ð¯ð² Patwa" }
+              ].map(opt => (
+                <button key={opt.id} onClick={() => setDirection(opt.id)} style={{ flex:1, padding:"12px 16px", borderRadius:10, border:`2px solid ${direction===opt.id?"#FFB900":"rgba(255,248,231,.1)"}`, background:direction===opt.id?"rgba(255,185,0,.1)":"transparent", color:direction===opt.id?"#FFB900":"rgba(255,248,231,.6)", cursor:"pointer", fontWeight:600, fontSize:13, fontFamily:"'DM Sans',sans-serif", transition:"all .2s" }}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <textarea
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder={direction==="patwa-sje"?"Enter Jamaican Patwa text...":"Enter Standard English text..."}
+            style={{ width:"100%", minHeight:200, padding:16, borderRadius:10, background:"rgba(255,248,231,.03)", border:"1px solid rgba(255,248,231,.1)", color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", fontSize:14, lineHeight:1.6, resize:"vertical", outline:"none", marginBottom:16 }}
+            aria-label="Text to translate"
+          />
+
+          <button className="btn-g" onClick={handleTranslate} disabled={loading} style={{ width:"100%", padding:"15px 24px", fontSize:14 }}>
+            {loading ? "Translating..." : "Translate & Explain ð"}
+          </button>
+        </div>
+
+        {error && <div style={{ padding:16, borderRadius:12, background:"rgba(255,80,80,.15)", border:"1px solid rgba(255,80,80,.3)", color:"#ff6060", marginBottom:24 }}>{error}</div>}
+
+        {result && (
+          <div style={{ background:"#111411", borderRadius:16, padding:28, border:"1px solid rgba(255,248,231,.07)" }}>
+            <h3 className="wj-h" style={{ fontSize:22, color:"#00BF68", marginBottom:20 }}>Translation & Explanation</h3>
+            <div style={{ color:"rgba(255,248,231,.85)", lineHeight:1.7, fontSize:14 }}>
+              {typeof result === "string" ? (
+                <p>{result}</p>
+              ) : (
+                <div>
+                  {result.translation && (
+                    <div style={{ marginBottom:16, padding:16, borderRadius:10, background:"rgba(0,155,85,.08)", border:"1px solid rgba(0,155,85,.2)" }}>
+                      <h4 style={{ color:"#00BF68", fontWeight:700, marginBottom:8 }}>Translation:</h4>
+                      <p style={{ fontSize:16, color:"#FFF8E7" }}>{result.translation}</p>
+                    </div>
+                  )}
+                  {result.explanation && (
+                    <div>
+                      <h4 style={{ color:"#FFB900", fontWeight:700, marginBottom:8 }}>Linguistic Notes:</h4>
+                      <p>{result.explanation}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <button className="btn-o" onClick={() => setResult(null)} style={{ marginTop:20, width:"100%", padding:"12px 24px" }}>Close Translation</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DashboardView({ user }: { user: any }) {
+  const [profile, setProfile] = useState<any>(null);
+  const [writings, setWritings] = useState<any[]>([]);
+  const [progress, setProgress] = useState<any[]>([]);
+  const [badges, setBadges] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      if (!user) return;
+      try {
+        const [pRes, wRes, progRes, badgeRes] = await Promise.all([
+          supabase.from("learner_profiles").select("*").eq("auth_user_id", user.id).single(),
+          supabase.from("user_writings").select("*").eq("learner_id", user.id).order("created_at", { ascending: false }).limit(3),
+          supabase.from("reading_progress").select("*").eq("learner_id", user.id).order("created_at", { ascending: false }).limit(5),
+          supabase.from("learner_achievements").select("*").eq("learner_id", user.id),
+        ]);
+        if (pRes.data) setProfile(pRes.data);
+        if (wRes.data) setWritings(wRes.data);
+        if (progRes.data) setProgress(progRes.data);
+        if (badgeRes.data) setBadges(badgeRes.data);
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+      }
+      setLoading(false);
+    };
+    fetchDashboard();
+  }, [user]);
+
+  if (loading) return <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,248,231,.5)" }}>Loading dashboard...</div>;
+
+  if (!profile) return <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,248,231,.5)" }}>Sign in to view your dashboard</div>;
+
   return (
     <div style={{ minHeight:"100vh", padding:"48px 40px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div style={{ marginBottom:38 }}>
-          <p style={{ color:"rgba(255,248,231,.45)", fontSize:14, marginBottom:4 }}>Good morning, Kezia 🌅</p>
+          <p style={{ color:"rgba(255,248,231,.45)", fontSize:14, marginBottom:4 }}>Good to see you, {profile.name} ð</p>
           <h2 className="wj-h" style={{ fontSize:36, color:"#FFF8E7" }}>Your Learning Journey</h2>
         </div>
+
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(175px,1fr))", gap:14, marginBottom:36 }}>
           {[
-            { icon:"🔥", value:"12",  label:"Day Streak",    color:"#FFB900" },
-            { icon:"📖", value:"47",  label:"Stories Read",  color:"#009B55" },
-            { icon:"🔤", value:"214", label:"Words Learned", color:"#1E90FF" },
-            { icon:"🏅", value:"3/6", label:"Badges Earned", color:"#9D4EDD" },
-            { icon:"✍️", value:"8",   label:"Pieces Written",color:"#C4622D" },
+            { icon:"ð¥", value: profile.current_streak || "0", label:"Day Streak",    color:"#FFB900" },
+            { icon:"ð", value: progress.length, label:"Stories Read",  color:"#009B55" },
+            { icon:"ð¤", value: "214", label:"Words Learned", color:"#1E90FF" },
+            { icon:"ð", value: badges.length || "0", label:"Badges Earned", color:"#9D4EDD" },
+            { icon:"âï¸", value: writings.length, label:"Pieces Written",color:"#C4622D" },
           ].map(s=>(
             <div key={s.label} style={{ background:"#111411", borderRadius:14, padding:"20px 22px", border:`1px solid ${s.color}22` }}>
-              <div style={{ fontSize:26, marginBottom:8 }}>{s.icon}</div>
+              <div style={{ fontSize:26, marginBottom:8 }} aria-hidden="true">{s.icon}</div>
               <div className="wj-h" style={{ fontSize:30, color:s.color, lineHeight:1 }}>{s.value}</div>
               <div style={{ fontSize:12, color:"rgba(255,248,231,.45)", marginTop:4 }}>{s.label}</div>
             </div>
           ))}
         </div>
+
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:20 }}>
           <div style={{ background:"#111411", borderRadius:16, padding:28, border:"1px solid rgba(255,248,231,.07)" }}>
             <h3 style={{ fontSize:16, fontWeight:700, color:"#FFF8E7", marginBottom:22 }}>Skills Progress</h3>
@@ -347,38 +870,50 @@ function DashboardView() {
               ))}
             </div>
           </div>
+
           <div style={{ background:"#111411", borderRadius:16, padding:28, border:"1px solid rgba(255,248,231,.07)" }}>
             <h3 style={{ fontSize:16, fontWeight:700, color:"#FFF8E7", marginBottom:22 }}>Badge Collection</h3>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
               {BADGES.map(b=>(
                 <div key={b.name} style={{ textAlign:"center" }}>
-                  <div style={{ width:54, height:54, borderRadius:"50%", margin:"0 auto 7px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, background:b.earned?`${b.color}20`:"rgba(255,248,231,.04)", border:`2px solid ${b.earned?b.color:"rgba(255,248,231,.1)"}`, filter:b.earned?"none":"grayscale(100%) opacity(.3)" }}>{b.emoji}</div>
+                  <div style={{ width:54, height:54, borderRadius:"50%", margin:"0 auto 7px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, background:b.earned?`${b.color}20`:"rgba(255,248,231,.04)", border:`2px solid ${b.earned?b.color:"rgba(255,248,231,.1)"}`, filter:b.earned?"none":"grayscale(100%) opacity(.3)" }} aria-label={b.earned ? `${b.name} badge earned` : `${b.name} badge locked`}>{b.emoji}</div>
                   <div style={{ fontSize:10, color:b.earned?"rgba(255,248,231,.7)":"rgba(255,248,231,.25)", lineHeight:1.3 }}>{b.name}</div>
                 </div>
               ))}
             </div>
-            <div style={{ marginTop:18, padding:"12px 15px", borderRadius:10, background:"rgba(157,78,221,.08)", border:"1px solid rgba(157,78,221,.2)", fontSize:12, color:"rgba(255,248,231,.7)" }}>
-              🏔️ <strong style={{ color:"#9D4EDD" }}>Next:</strong> Read 3 more stories to unlock &quot;Blue Mountain Reader&quot;
-            </div>
           </div>
         </div>
+
         <div style={{ background:"#111411", borderRadius:16, padding:26, border:"1px solid rgba(255,248,231,.07)" }}>
           <h3 style={{ fontSize:16, fontWeight:700, color:"#FFF8E7", marginBottom:18 }}>Recent Activity</h3>
-          {[
-            { icon:"📖", act:"Read",     title:"Anansi an di Hummingbird",              time:"Today, 9:14am",    pts:"+15 pts", color:"#FFB900" },
-            { icon:"✍️", act:"Wrote",    title:"My Favourite Yard Memory (narrative)",  time:"Yesterday",        pts:"+22 pts", color:"#009B55" },
-            { icon:"🎙️", act:"Recorded", title:"Oral retelling of Anansi story",        time:"2 days ago",       pts:"+18 pts", color:"#1E90FF" },
-            { icon:"🔤", act:"Mastered", title:"10 new Patwa vocabulary words",         time:"3 days ago",       pts:"+10 pts", color:"#9D4EDD" },
-          ].map((a,i)=>(
-            <div key={i} style={{ display:"flex", alignItems:"center", gap:15, padding:"14px 0", borderBottom:i<3?"1px solid rgba(255,248,231,.06)":"none" }}>
-              <div style={{ width:40, height:40, borderRadius:10, fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", background:`${a.color}14`, flexShrink:0 }}>{a.icon}</div>
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:14, color:"rgba(255,248,231,.85)", fontWeight:500 }}><span style={{ color:a.color }}>{a.act}:</span> {a.title}</div>
-                <div style={{ fontSize:11, color:"rgba(255,248,231,.38)", marginTop:2 }}>{a.time}</div>
-              </div>
-              <div style={{ fontSize:12, fontWeight:700, color:a.color }}>{a.pts}</div>
+          {progress.length > 0 || writings.length > 0 ? (
+            <div>
+              {progress.map((p, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:15, padding:"14px 0", borderBottom:i<progress.length-1?"1px solid rgba(255,248,231,.06)":"none" }}>
+                  <div style={{ width:40, height:40, borderRadius:10, fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", background:"#FFB90014", flexShrink:0 }} aria-hidden="true">ð</div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:14, color:"rgba(255,248,231,.85)", fontWeight:500 }}><span style={{ color:"#FFB900" }}>Read:</span> Story ({p.quiz_score}/{p.quiz_total} correct)</div>
+                    <div style={{ fontSize:11, color:"rgba(255,248,231,.38)", marginTop:2 }}>Recently</div>
+                  </div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#FFB900" }}>+15 pts</div>
+                </div>
+              ))}
+              {writings.map((w, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:15, padding:"14px 0", borderBottom:i<writings.length-1?"1px solid rgba(255,248,231,.06)":"none" }}>
+                  <div style={{ width:40, height:40, borderRadius:10, fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", background:"#009B5514", flexShrink:0 }} aria-hidden="true">âï¸</div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:14, color:"rgba(255,248,231,.85)", fontWeight:500 }}><span style={{ color:"#009B55" }}>Wrote:</span> {w.title.substring(0, 40)}</div>
+                    <div style={{ fontSize:11, color:"rgba(255,248,231,.38)", marginTop:2 }}>Recently</div>
+                  </div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#009B55" }}>+{w.points_earned} pts</div>
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <div style={{ color:"rgba(255,248,231,.5)", textAlign:"center", padding:"30px 20px" }}>
+              No activity yet. Start reading or writing to see your progress here!
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -388,7 +923,7 @@ function DashboardView() {
 function TeacherView() {
   const [tab, setTab] = useState("roster");
   const TabBtn = ({ id, label }: { id: string; label: string }) => (
-    <button className="tab-btn" onClick={()=>setTab(id)} style={{ background:tab===id?"#FFB900":"transparent", color:tab===id?"#080A08":"rgba(255,248,231,.6)" }}>{label}</button>
+    <button className="tab-btn" onClick={()=>setTab(id)} style={{ background:tab===id?"#FFB900":"transparent", color:tab===id?"#080A08":"rgba(255,248,231,.6)" }} role="tab" aria-selected={tab===id}>{label}</button>
   );
   return (
     <div style={{ minHeight:"100vh", padding:"48px 40px" }}>
@@ -397,13 +932,14 @@ function TeacherView() {
           <div>
             <p style={{ color:"rgba(255,248,231,.4)", fontSize:13, marginBottom:4 }}>Teacher Dashboard</p>
             <h2 className="wj-h" style={{ fontSize:34, color:"#FFF8E7" }}>Command Centre</h2>
-            <p style={{ color:"rgba(255,248,231,.45)", fontSize:13, marginTop:4 }}>Class 4B · Sapling Band · 24 Learners</p>
+            <p style={{ color:"rgba(255,248,231,.45)", fontSize:13, marginTop:4 }}>Class 4B Â· Sapling Band Â· 24 Learners</p>
           </div>
           <div style={{ display:"flex", gap:10 }}>
-            <button className="btn-o" style={{ padding:"10px 18px", fontSize:13 }}>📤 Export Report</button>
-            <button className="btn-g" style={{ padding:"10px 18px", fontSize:13 }}>+ New Assignment</button>
+            <button className="btn-o" style={{ padding:"10px 18px", fontSize:13 }} aria-label="Export class report">ð¤ Export Report</button>
+            <button className="btn-g" style={{ padding:"10px 18px", fontSize:13 }} aria-label="Create new assignment">+ New Assignment</button>
           </div>
         </div>
+
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))", gap:12, marginBottom:28 }}>
           {[
             { label:"Class Avg. Progress",         value:"73%",    color:"#FFB900" },
@@ -417,16 +953,18 @@ function TeacherView() {
             </div>
           ))}
         </div>
-        <div style={{ display:"flex", gap:4, marginBottom:22, background:"#111411", borderRadius:100, padding:4, width:"fit-content", border:"1px solid rgba(255,248,231,.07)" }}>
-          <TabBtn id="roster"      label="👥 Roster"/>
-          <TabBtn id="assignments" label="📋 Assignments"/>
-          <TabBtn id="ai-queue"    label="🤖 AI Review Queue"/>
+
+        <div style={{ display:"flex", gap:4, marginBottom:22, background:"#111411", borderRadius:100, padding:4, width:"fit-content", border:"1px solid rgba(255,248,231,.07)" }} role="tablist">
+          <TabBtn id="roster"      label="ð¥ Roster"/>
+          <TabBtn id="assignments" label="ð Assignments"/>
+          <TabBtn id="ai-queue"    label="ð¤ AI Review Queue"/>
         </div>
+
         {tab==="roster" && (
           <div style={{ background:"#111411", borderRadius:16, border:"1px solid rgba(255,248,231,.07)", overflow:"hidden" }}>
             <div style={{ padding:"14px 22px", borderBottom:"1px solid rgba(255,248,231,.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <span style={{ fontSize:13, fontWeight:600, color:"rgba(255,248,231,.55)" }}>5 of 24 learners shown</span>
-              <input placeholder="🔍 Search learners..." style={{ background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", borderRadius:100, padding:"8px 15px", fontSize:12, color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", outline:"none" }}/>
+              <input placeholder="ð Search learners..." style={{ background:"rgba(255,248,231,.05)", border:"1px solid rgba(255,248,231,.1)", borderRadius:100, padding:"8px 15px", fontSize:12, color:"#FFF8E7", fontFamily:"'DM Sans',sans-serif", outline:"none" }} aria-label="Search learners"/>
             </div>
             <table style={{ width:"100%", borderCollapse:"collapse" }}>
               <thead>
@@ -457,11 +995,11 @@ function TeacherView() {
                     </td>
                     <td style={{ padding:"15px 20px" }}>
                       <span style={{ fontSize:13, color:s.streak>=14?"#FFB900":"rgba(255,248,231,.55)" }}>
-                        {s.streak>=14?"🔥":""} {s.streak}d
+                        {s.streak>=14?"ð¥":""} {s.streak}d
                       </span>
                     </td>
                     <td style={{ padding:"15px 20px" }}>
-                      <button style={{ fontSize:12, padding:"6px 14px", borderRadius:100, cursor:"pointer", background:"rgba(255,248,231,.06)", border:"1px solid rgba(255,248,231,.1)", color:"rgba(255,248,231,.7)", fontFamily:"'DM Sans',sans-serif" }}>View →</button>
+                      <button style={{ fontSize:12, padding:"6px 14px", borderRadius:100, cursor:"pointer", background:"rgba(255,248,231,.06)", border:"1px solid rgba(255,248,231,.1)", color:"rgba(255,248,231,.7)", fontFamily:"'DM Sans',sans-serif" }} aria-label={`View ${s.name} details`}>View â</button>
                     </td>
                   </tr>
                 ))}
@@ -469,12 +1007,13 @@ function TeacherView() {
             </table>
           </div>
         )}
+
         {tab==="assignments" && (
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
             {[
-              { title:"Anansi Story Retelling — Oral Recording",        due:"Apr 15, 2026", type:"Oral Literacy",  submitted:18, total:24, color:"#1E90FF" },
-              { title:"My Community Narrative — Written Essay",         due:"Apr 18, 2026", type:"Writing",        submitted:22, total:24, color:"#009B55" },
-              { title:"Patwa Proverb Interpretation — Discussion Post", due:"Apr 22, 2026", type:"Comprehension",  submitted:5,  total:24, color:"#FFB900" },
+              { title:"Anansi Story Retelling â Oral Recording",        due:"Apr 15, 2026", type:"Oral Literacy",  submitted:18, total:24, color:"#1E90FF" },
+              { title:"My Community Narrative â Written Essay",         due:"Apr 18, 2026", type:"Writing",        submitted:22, total:24, color:"#009B55" },
+              { title:"Patwa Proverb Interpretation â Discussion Post", due:"Apr 22, 2026", type:"Comprehension",  submitted:5,  total:24, color:"#FFB900" },
             ].map((a,i)=>(
               <div key={i} style={{ background:"#111411", borderRadius:14, padding:"20px 24px", border:"1px solid rgba(255,248,231,.07)", display:"flex", alignItems:"center", gap:18, flexWrap:"wrap" }}>
                 <div style={{ flex:1, minWidth:200 }}>
@@ -494,11 +1033,12 @@ function TeacherView() {
             ))}
           </div>
         )}
+
         {tab==="ai-queue" && (
           <div>
             <div style={{ padding:18, borderRadius:12, marginBottom:18, background:"rgba(157,78,221,.08)", border:"1px solid rgba(157,78,221,.22)", display:"flex", alignItems:"center", gap:12 }}>
-              <span style={{ fontSize:22 }}>🤖</span>
-              <p style={{ fontSize:13, color:"rgba(255,248,231,.7)" }}><strong style={{ color:"#9D4EDD" }}>AI Pre-Scoring Active.</strong> Claude has reviewed 7 submissions and flagged items for your attention. Scores are suggestions — you make the final call.</p>
+              <span style={{ fontSize:22 }} aria-hidden="true">ð¤</span>
+              <p style={{ fontSize:13, color:"rgba(255,248,231,.7)" }}><strong style={{ color:"#9D4EDD" }}>AI Pre-Scoring Active.</strong> Claude has reviewed 7 submissions and flagged items for your attention. Scores are suggestions â you make the final call.</p>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {[
@@ -510,7 +1050,7 @@ function TeacherView() {
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:15, fontWeight:600, color:"#FFF8E7", marginBottom:3 }}>{item.learner}</div>
                     <div style={{ fontSize:12, color:"rgba(255,248,231,.45)", marginBottom:7 }}>{item.assignment}</div>
-                    <div style={{ fontSize:13, color:"rgba(255,248,231,.7)", fontStyle:"italic" }}>💬 AI: {item.flag}</div>
+                    <div style={{ fontSize:13, color:"rgba(255,248,231,.7)", fontStyle:"italic" }}>ð¬ AI: {item.flag}</div>
                   </div>
                   <div style={{ textAlign:"center" }}>
                     <div className="wj-h" style={{ fontSize:22, color:item.color }}>{item.score}</div>
@@ -535,41 +1075,109 @@ export default function WordJam() {
   const [visible, setVisible] = useState(true);
   const [showPatwa, setShowPatwa] = useState(true);
   const [activeBand, setActiveBand] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription?.unsubscribe();
+  }, []);
 
   const navigate = (next: string) => {
     setVisible(false);
     setTimeout(() => { setView(next); setVisible(true); }, 210);
   };
 
+  const handleAuth = async (email: string, password: string, name: string, role: string, gradeBand: string) => {
+    const isSignUp = !user;
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        if (data.user) {
+          await supabase.from("learner_profiles").insert({
+            auth_user_id: data.user.id,
+            name,
+            email,
+            role,
+            age_group: gradeBand,
+            xp: 0,
+            current_streak: 0,
+            longest_streak: 0,
+          });
+          setUser(data.user);
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        setUser(data.user);
+      }
+    } catch (err: any) {
+      throw new Error(err.message || "Authentication failed");
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    navigate("landing");
+  };
+
   const fadeCSS = `
     .fade-page{opacity:${visible?1:0};transform:translateY(${visible?0:12}px);transition:opacity .22s ease,transform .22s ease;}
   `;
 
+  const currentStoryId = view.startsWith("story:") ? view.split(":")[1] : null;
+
   return (
     <div className="wj">
       <style>{GLOBAL_CSS + fadeCSS}</style>
-      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:62, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 36px", background:"rgba(8,10,8,.9)", backdropFilter:"blur(18px)", borderBottom:"1px solid rgba(255,185,0,.1)" }}>
-        <div onClick={()=>navigate("landing")} style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+
+      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:62, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 36px", background:"rgba(8,10,8,.9)", backdropFilter:"blur(18px)", borderBottom:"1px solid rgba(255,185,0,.1)" }} role="navigation" aria-label="Main navigation">
+        <div onClick={()=>navigate("landing")} style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} role="button" tabIndex={0} onKeyDown={e => { if(e.key==="Enter" || e.key===" ") navigate("landing"); }} aria-label="WordJam home">
           <div style={{ width:33, height:33, borderRadius:8, background:"linear-gradient(135deg,#FFB900,#009B55)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#080A08", fontFamily:"Abril Fatface,serif" }}>W</div>
           <span className="wj-h" style={{ fontSize:19, color:"#FFF8E7", letterSpacing:.5 }}>WORD<span style={{ color:"#FFB900" }}>JAM</span></span>
         </div>
         <div style={{ display:"flex", gap:28 }}>
-          {[["Learn","bands"],["Stories","read"],["My Progress","dashboard"],["Teachers","teacher"]].map(([l,t])=>(
-            <span key={t} className={`nav-i${view===t?" nav-a":""}`} onClick={()=>navigate(t)}>{l}</span>
+          {[["Learn","bands"],["Stories","read"],["Write","write"],["My Progress","dashboard"],["Teachers","teacher"]].map(([l,t])=>(
+            <span key={t} className={`nav-i${view===t?" nav-a":""}`} onClick={()=>navigate(t)} role="button" tabIndex={0} onKeyDown={e => { if(e.key==="Enter" || e.key===" ") navigate(t); }}>{l}</span>
           ))}
         </div>
         <div style={{ display:"flex", gap:10 }}>
-          <button className="btn-o" style={{ padding:"9px 18px", fontSize:13 }}>Sign In</button>
-          <button className="btn-g" style={{ padding:"9px 18px", fontSize:13 }}>Start Free 🎉</button>
+          {user ? (
+            <>
+              <span style={{ color:"rgba(255,248,231,.6)", fontSize:13, display:"flex", alignItems:"center" }}>{user.email}</span>
+              <button className="btn-o" onClick={handleLogout} style={{ padding:"9px 18px", fontSize:13 }}>Sign Out</button>
+            </>
+          ) : (
+            <>
+              <button className="btn-o" onClick={() => setAuthModalOpen(true)} style={{ padding:"9px 18px", fontSize:13 }}>Sign In</button>
+              <button className="btn-g" onClick={() => setAuthModalOpen(true)} style={{ padding:"9px 18px", fontSize:13 }}>Start Free ð</button>
+            </>
+          )}
         </div>
       </nav>
-      <div className="fade-page" style={{ paddingTop:62 }}>
+
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} onAuth={handleAuth}/>
+
+      <main id="main-content" className="fade-page" style={{ paddingTop:62 }}>
         {view==="landing"   && <LandingView navigate={navigate}/>}
         {view==="bands"     && <GradeBandsView navigate={navigate} activeBand={activeBand} setActiveBand={setActiveBand}/>}
-        {view==="read"      && <ReadingView showPatwa={showPatwa} setShowPatwa={setShowPatwa}/>}
-        {view==="dashboard" && <DashboardView/>}
+        {view==="read"      && <StoryLibraryView navigate={navigate} user={user}/>}
+        {currentStoryId && <StoryReaderView navigate={navigate} storyId={currentStoryId} user={user}/>}
+        {view==="write"     && <WritingStudioView navigate={navigate} user={user}/>}
+        {view==="bridge"    && <CreoleBridgeView navigate={navigate}/>}
+        {view==="dashboard" && <DashboardView user={user}/>}
         {view==="teacher"   && <TeacherView/>}
-      </div>
+      </main>
     </div>
   );
 }
