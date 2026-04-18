@@ -10,7 +10,6 @@ const GRADE_BANDS = [
   { id: "branch",   label: "Branch",   emoji: "🌲", grades: "Grades 6–8",     ages: "Ages 11–13",desc: "Critical literacy, code-switching & analytical reading",  color: "#1E90FF", bg: "rgba(30,144,255,0.1)", skills: ["Critical Literacy", "Code-Switching", "Analysis"] },
   { id: "canopy",   label: "Canopy",   emoji: "🏔️", grades: "Grades 9–11",    ages: "Ages 14–17",desc: "Academic writing, research literacy & digital discourse", color: "#9D4EDD", bg: "rgba(157,78,221,0.1)", skills: ["Academic Writing", "Research", "Digital Discourse"] },
 ];
-
 const STORY_PATWA = [
   "Anansi did love fi tell story more dan anyting inna di world.",
   "One bright mawnin, im climb up im web — high, high inna di Blue Mountain sky, where di cloud dem touch di tallest treetop.",
